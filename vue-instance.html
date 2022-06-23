@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head></head>
+  <body>
+    <div id="app">
+      <p>{{ foo }}</p>
+      <!-- This will no longer update 'foo'! -->
+      <button v-on:click="foo = 'baz'">Change it</button>
+    </div>
+  </body>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script>
+    var data = { a: 1 };
+
+    // vm (ViewModel) is the variable name
+    // used by convention to refer to Vue instance
+    var vm = new Vue({
+      // options
+      el: "#example",
+      data: data,
+      // when a Vue instance is created,
+      // it adds all the properties found in its data object
+      // to Vue's reactivity system
+      // When the values change, the view will react, updating to match the new values
+      created() {
+        // used to run code after an instance is created
+        console.log("a is: " + this.a);
+      }, // => "a is: 1"
+    });
+
+    // other than data properties, Vue instances
+    // expose a number of useful properties and methods,
+    // they are prefixed with $
+    vm.$data === data; // => true
+    vm.$el === document.getElementById("example"); // => true
+
+    // $watch is an instance method
+    vm.$watch("a", function (newValue, oldValue) {
+      // This callback will be called when 'vm.a' changes
+    });
+
+    var obj = {
+      foo: "bar",
+    };
+
+    Object.freeze(obj);
+    // Object.freeze prevents existing properties from being changed
+    //so the reactivity system can't track changes
+
+    new Vue({
+      el: "#app",
+      data: obj,
+    });
+  </script>
+</html>
