@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head></head>
+  <body>
+    <!--                                   v-if                                      -->
+    <!-- v-if dir. is used to conditionally render a block. The block will be rendered if the expression returns true -->
+    <h1 v-if="awesome">Vue is awesome!</h1>
+    <!-- v-else is used to add else block, it must immediately follow the v-if or v-else-if element -->
+    <h1 v-else>Oh no</h1>
+
+    <!-- if we want multiple elements to be conditionally displayed, we use the dir. on a <template> -->
+    <template v-if="ok">
+      <h1>Title</h1>
+      <p>Paragraph 1</p>
+      <p>Paragraph 2</p>
+    </template>
+
+    <!-- key attribute is added to the elements to make Vue know that the elements are separate -->
+    <template v-if="loginType === 'username'">
+      <label>Username</label>
+      <input placeholder="Enter your username" key="username-input" />
+    </template>
+    <template v-else>
+      <label>Email</label>
+      <input placeholder="Enter your email address" key="email-input" />
+    </template>
+
+    <!--                                   v-show                                      -->
+
+    <!-- v-show dir is also used for conditionally displaying elements -->
+    <h1 v-show="ok">Hello!</h1>
+
+    <!-- The DIFFERENCE from v-if is that the element with v-show will ALWAYS BE RENDERED and remain in the DOM
+        v-show only toggles the display CSS property of the element-->
+
+    <!-- v-show does NOT support template element or v-else-->
+  </body>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script></script>
+</html>
