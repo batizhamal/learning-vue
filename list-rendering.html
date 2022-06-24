@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+  <head></head>
+  <body>
+    <!--                           Mapping an Array to Elements with v-for                        -->
+
+    <!-- v-for dir requires a special syntax in the form of item in items, 
+        where items is the source data array and item is an alias for the array element being iterated on
+        We can also use of instead of in-->
+    <ul id="example-1">
+      <li v-for="item in items" :key="item.message">{{ item.message }}</li>
+    </ul>
+
+    <!-- v-for also supports an optional second argument for the index of the current item -->
+    <ul id="example-2">
+      <li v-for="(item, index) in items">
+        {{ parentMessage }} - {{ index }} - {{ item.message }}
+      </li>
+    </ul>
+
+    <!--                                  v-for with an Object                                   -->
+
+    <ul id="v-for-object" class="demo">
+      <li v-for="value in object">{{ value }}</li>
+    </ul>
+
+    <!-- we can also provide a second argument for the property's name-->
+    <ul id="v-for-object" class="demo">
+      <li v-for="(value, name) in object">{{ name }}: {{ value }}</li>
+    </ul>
+
+    <!-- and provide another argument for the index -->
+    <ul id="v-for-object" class="demo">
+      <li v-for="(value, name, index) in object">
+        {{ index }}. {{ name }}: {{ value }}
+      </li>
+    </ul>
+
+    <!--                                   Maintaining State                                   -->
+
+    <!-- When Vue is updating a list of elements rendered with v-for, by default it uses an “in-place patch” strategy. 
+    If the order of the data items has changed, instead of moving the DOM elements to match the order of the items, 
+    Vue will patch each element in-place and make sure it reflects what should be rendered at that particular index.  -->
+
+    <!--To give Vue a hint so that it can track each node’s identity, and thus reuse and reorder existing elements, 
+        you need to provide a unique key attribute for each item-->
+    <div v-for="item in items" v-bind:key="item.id">
+      <!--content-->
+    </div>
+
+    <!--                                   Array Change Detection                                   -->
+
+    <!-- Vue wraps an observed array's mutation methods so they will also trigger view updates.
+        The wrapped methods are:
+        push()
+        pop()
+        shift()
+        unshift()
+        splice()
+        sort()
+        reverse()
+    -->
+
+    <!-- Non-mutating methods like filter(), concat(), and slice() 
+        do not mutate the original array, but always return a new array.
+        So when working with them, we replace the old arrays with the new onse.
+        In those cases Vue does not throw away the existing DOM to re-render the entire list, 
+        but implements something krutoe to maximize DOM elements reuse-->
+
+    <!--                                  Displaying Filtered/Sorted Results                         -->
+
+    <!-- Sometimes we want to display a filtered or sorted version of an array without 
+        actually mutating or resetting the original data.
+        In this case we can create a computed property that returns the filtered or sorted array.  -->
+    <div id="filtered-sorted-results">
+      <ul>
+        <li v-for="n in evenNumbers">{{ n }}</li>
+      </ul>
+
+      <!-- In cases where computed properties are not feasible (e.g. inside nested v-for)
+        we can use a method-->
+      <ul v-for="set in sets">
+        <li v-for="n in even(set))">{{ n }}</li>
+      </ul>
+    </div>
+
+    <!--                                   v-for with a Range                            -->
+
+    <!-- v-for can also take an integer. In this case it will repeat the template that many times-->
+    <div>
+      <span v-for="n in 10">{{ n }}</span>
+    </div>
+
+    <!--                                   v-for on a <template>                          -->
+
+    <!-- Similar to template with v-if, 
+        we can also use a <template> tag with v-for
+        to render a block of multiple elements -->
+    <div>
+      <ul>
+        <template v-for="item in items">
+          <li>{{ item.msg }}</li>
+          <li class="divider" role="presentation"></li>
+        </template>
+      </ul>
+    </div>
+
+    <!--                                 v-for with v-if                          -->
+
+    <!-- (It is not recommended to use them together)
+        v-for has a higher priority than v-if.
+        v-if will be run on each iteration of the loop separately.-->
+    <li v-for="todo in todos" v-if="!todo.isComplete">{{ todo }}</li>
+    <!-- this will render the todos that are not complete-->
+
+    <!-- If we intent to conditionally skip execution of the loop,
+        we can place the v-if on a wrapper element or <template>-->
+    <ul v-if="todos.length">
+      <li v-for="todo in todos">{{ todo }}</li>
+    </ul>
+    <p v-else>No todos left!</p>
+
+    <!--                                     v-for with a Component                                  -->
+
+    <!-- we can directly use v-for on a custom component, like any normal element.
+        However, the data will not be automatically passed into the component, 
+        because components have the isolated scopes of their own 
+        So in order to pass iterated data into the component, we should use props.-->
+    <my-component
+      v-for="(item, index) in items"
+      v-bind:item="item"
+      v-bind:index="index"
+      v-bind:key="item.id"
+    ></my-component>
+
+    <!-- complete example of a simple todolit is in a separate file-->
+  </body>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script>
+    var example1 = new Vue({
+      el: "#example-1",
+      data: {
+        items: [{ message: "Foo" }, { message: "Bar" }],
+      },
+    });
+
+    var example2 = new Vue({
+      el: "#example-2",
+      data: {
+        parentMessage: "Parent",
+        items: [{ message: "Foo" }, { message: "Bar" }],
+      },
+    });
+
+    new Vue({
+      el: "#v-for-object",
+      data: {
+        object: {
+          title: "How to do lists in Vue",
+          author: "Jane Doe",
+          publishedAt: "2016-04-10",
+        },
+      },
+    });
+
+    new Vue({
+      el: "#filtered-sorted-results",
+      data: {
+        numbers: [1, 2, 3, 4, 5],
+        sets: [
+          [1, 2, 3, 4, 5],
+          [6, 7, 8, 9, 10],
+        ],
+      },
+      computed: {
+        evenNumbers() {
+          return this.numbers.filter((number) => number % 2 === 0);
+        },
+      },
+      methods: {
+        even() {
+          return numbers.filter((number) => number % 2 === 0);
+        },
+      },
+    });
+  </script>
+</html>
