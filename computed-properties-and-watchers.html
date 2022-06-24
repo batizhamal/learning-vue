@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <head></head>
+  <body>
+    <!--                                Computed Properties                           -->
+
+    <!-- Putting too much logic in templates is ne ochen , for ex. -->
+    <div id="wrong-example">{{ message.split('').reverse().join('') }}</div>
+    <!-- for any complex logic, you should use a computed property-->
+
+    <div id="example">
+      <p>Original message: "{{ message }}"</p>
+      <p>Computed reversed message: "{{ reversedMessage }}"</p>
+      <!-- the same result could be obtained by making a similr method in methods
+          however the difference is that a compute property which depends on certain data
+          will automatically update whenever that reactive dependency changes,
+          whilst the method returns a value only when it is envoked-->
+      <!-- in case you do not want caching, which happens when computed properties are used, 
+          use a method instead-->
+
+      <!-- We can also provide setters using computed properties -->
+      <p>Getting fullname: {{ fullname }}</p>
+      <p>Setting fullname: {{ fullname = 'NewFoo NewBar'}}</p>
+    </div>
+
+    <!--                                Watchers                              -->
+
+    <!-- Another way Vue provides to react to data changes is Watchers
+        Most useful when you want to perform asynchronous or expensive operations in response to data change-->
+    <div id="watch-example">
+      <p>
+        Ask a yes/no question:
+        <input v-model="question" />
+      </p>
+      <p>{{ answer }}</p>
+    </div>
+  </body>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios@0.12.0/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js"></script>
+  <script>
+    var vm = new Vue({
+      el: "#example",
+      data: {
+        message: "Hello!",
+        firstName: "Foo",
+        lastName: "Bar",
+      },
+      computed: {
+        // a computed getter
+        reversedMessage() {
+          // 'this' points to the vm instance
+          return this.message.split("").reverse().join("");
+        },
+
+        fullname: {
+          // getter
+          get: function () {
+            return this.firstName + " " + this.lastName;
+          },
+
+          // setter
+          set: function (newValue) {
+            var names = newValue.split(" ");
+            this.firstName = names[0];
+            this.lastName = names[names.length - 1];
+          },
+        },
+      },
+    });
+
+    var watchExampleVM = new Vue({
+      el: "#watch-example",
+      data: {
+        question: "",
+        answer: "I cannot give you an answer until you ask a question!",
+      },
+      watch: {
+        // whenever question changes, this function will run
+        question: function (newQuestion, oldQuestion) {
+          this.answer = "Waiting for you to stop typing...";
+          this.debouncedGetAnswer();
+        },
+      },
+      created: function () {
+        // _.debounce is a function provided by lodash to limit how
+        // often a particularly expensive operation can be run.
+        // In this case, we want to limit how often we access yesno.wtf/api,
+        // waiting until user has completely finished typing before making ajax request.
+        this.debouncedGetAnswer = _.debounce(this.getAnswer, 500);
+      },
+      methods: {
+        getAnswer() {
+          if (this.question.indexOf("?") === -1) {
+            this.answer = "Question ususally contain a question mark. ;-";
+            return;
+          }
+          this.answer = "Thinking...";
+          var vm2 = this;
+          axios
+            .get("https://yesno.wtf/api")
+            .then(function (response) {
+              vm2.answer = _.capitalize(response.data.answer);
+            })
+            .catch(function (error) {
+              vm2.answer = "Error! Could not reach the API." + error;
+            });
+        },
+      },
+    });
+  </script>
+</html>
