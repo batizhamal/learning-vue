@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+  <head></head>
+  <body>
+    <!--                      Listening to Events                     -->
+
+    <!-- We can use the v-on dir to listen to DOM events 
+        and run some JS when they're triggered-->
+    <div id="example-1">
+      <button v-on:click="counter += 1">Add 1</button>
+      <p>The button above has been clicked {{ counter }} times.</p>
+    </div>
+
+    <!--                     Method Event Handlers                     -->
+
+    <!-- v-on also accepts the name of a method we'd like to call -->
+    <div id="example-2">
+      <!-- 'greet' is the name of the method defined below -->
+      <button v-on:click="greet">Greet</button>
+    </div>
+
+    <!--                    Method in Inline Handlers                   -->
+
+    <!-- Instead of binding directly to a method name,  
+        we can also use methods in an inline JS statement-->
+    <div id="example-3">
+      <button v-on:click="say('hi')">Say hi</button>
+      <button v-on:click="say('what')">Say what</button>
+      <!-- Somethimes we need to access the original DOM event in an inline statement handler
+        We can pass it into a method using the special $event variable-->
+      <button v-on:click="warn('Form cannot be submitted yet.', $event)">
+        Submit
+      </button>
+    </div>
+
+    <!--                        Event Modifiers                    -->
+
+    <!-- It is a very common need to call event.preventDefault() or event.stopPropagation()
+        inside event handlers. ALthough we can do this inside methods,
+        it is better if methods contain pure data logic
+        rather than dealing with DOM event details-->
+    <!-- So, Vue provides EVENT MODIFIERS for v-on. These are
+        .stop()
+        .prevent()
+        .capture()
+        .self()
+        .once()
+        .passive
+    -->
+
+    <!-- the click event's propagation will be stopped -->
+    <a v-on:click.stop="doThis"></a>
+
+    <!-- the submit event will no longer reload the page -->
+    <form v-on:submit.prevent="onSubmit"></form>
+
+    <!-- modifiers can be chained -->
+    <a v-on:click.stop.prevent="doThat"></a>
+
+    <!-- just the modifier -->
+    <form v-on:submit.prevent></form>
+
+    <!-- use capture mode when adding the event listener
+        i.e. an event targeting an inner element is handled here before being handled by that element -->
+    <div v-on:click.capture="doThis"></div>
+
+    <!-- only trigger handler if event.target is the element itself
+        i.e. not from a child element-->
+    <div v-on:click.self="doThat"></div>
+
+    <!-- the click event will be triggered at most once -->
+    <a v-on:click.once="doThis"></a>
+
+    <!-- the scroll event's default behaviour will happen
+        immediately, instead of waiting for 'onScroll' to complete
+        in case it contains 'event.preventDefault()'-->
+    <div v-on:scroll.passive="onScroll"></div>
+
+    <!--                               Key Modifiers                            -->
+
+    <!-- Vue allows adding key modifiers fpr v-on when listening for key events-->
+    <!-- For ex. only call 'vm.submit()' when the 'key' is 'Enter'-->
+    <input v-on:keyup.enter="submit" />
+
+    <!-- we can directly use valid key names exposed via KeyboardEvent.key
+        as modifiers by converting them into a snake-case-->
+    <input v-on:keyup.page-down="onPageDown" />
+
+    <!-- we can use keycodes -->
+    <input v-on:keyup.13="submit" />
+
+    <!-- most commonly used keys:
+        .enter
+        .tab
+        .delete
+        .esc
+        .space
+        .up
+        .down
+        .left
+        .right
+    -->
+
+    <!-- we can also define custom key modifier via the global config.keyCodes object
+        For ex. to enable 'v-on:keyup.f1
+        Vue.config.keyCodes.f1 = 112'-->
+
+    <!--                            System Modifier Keys                      -->
+
+    <!-- Following modifiers can be used to trigger mouse or keyboard event listeners
+        only when the corresponding modifier key is pressed
+        .ctrl
+        .alt
+        .shift
+        .meta
+    -->
+
+    <!-- Alt+C -->
+    <input v-on:keyup.alt.67="clear" />
+
+    <!-- Ctrl+Click -->
+    <div v-on:click.ctrl="doSomething">Do Something</div>
+
+    <!-- .exact modifier allows control of the exact combination of system modifiers 
+        needed to trigger an event -->
+
+    <!-- this will fire even if Alt or Shift is also pressed -->
+    <button v-on:click.ctrl="onClick">A</button>
+
+    <!-- this will only fire when Ctrl and no other keys are pressed -->
+    <button v-on:click.ctrl.exact="onCtrlClick">A</button>
+
+    <!-- this will only fire when no system modifiers are pressed -->
+    <button v-on:click.exact="onClick">A</button>
+
+    <!-- following modifiers restrict the handler to events triggered by a specific mouse button:
+        .left
+        .right
+        .middle
+     -->
+  </body>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script>
+    var example1 = new Vue({
+      el: "#example-1",
+      data: {
+        counter: 0,
+      },
+    });
+
+    var example2 = new Vue({
+      el: "#example-2",
+      data: {
+        name: "Vue.js",
+      },
+      methods: {
+        greet(event) {
+          alert("Hello " + this.name + "!");
+          // 'event' is the native DOM event
+          if (event) {
+            alert(event.target.tagName);
+          }
+        },
+      },
+    });
+
+    var example3 = new Vue({
+      el: "#example-3",
+      methods: {
+        say(message) {
+          alert(message);
+        },
+        warn(message, event) {
+          // now we access the native event
+          if (event) {
+            event.preventDefault();
+          }
+          alert(message);
+        },
+      },
+    });
+  </script>
+</html>
